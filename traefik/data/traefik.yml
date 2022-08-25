@@ -9,19 +9,19 @@ providers:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
 
-http:
-  routers:
-    http-catchall:
-      rule: HostRegexp(`{host:.+}`)
-      entrypoints:
-      - http
-      middlewares:
-      - redirect-to-https
-  middlewares:
-    redirect-to-https:
-      redirectScheme:
-        scheme: https
-        permanent: true
+#http:
+#  routers:
+#    http-catchall:
+#      rule: HostRegexp(`{host:.+}`)
+#      entrypoints:
+#      - http
+#      middlewares:
+#      - redirect-to-https
+#  middlewares:
+#    redirect-to-https:
+#      redirectScheme:
+#        scheme: https
+#        permanent: false
 
 certificatesResolvers:
   letsEncrypt:

@@ -16,25 +16,35 @@ services:
       - ./data/acme.json:/acme.json
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.entrypoints=https"
+      - "traefik.http.routers.traefik.entrypoints=http"
       - "traefik.http.routers.traefik.rule=Host(`alselon.ru`)"
-      - "traefik.http.routers.traefik.tls=true"
-      - "traefik.http.routers.traefik.tls.certresolver=letsEncrypt"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.services.traefik-traefik.loadbalancer.server.port=888"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$8C1sxhTC$$jdRmlQBzTyrSeAGdLFvyb/"
-      - "traefik.http.routers.traefik.middlewares=traefik-auth"
-
+      - "traefik.http.routers.traefik-https.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-https.entrypoints=https"
+      - "traefik.http.routers.traefik-https.rule=Host(`alselon.ru`)"
+      - "traefik.http.routers.traefik-https.tls=true"
+      - "traefik.http.routers.traefik-https.tls.certresolver=letsEncrypt"
+      - "traefik.http.middlewares.traefik-redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.traefik-redirect-to-https.redirectscheme.permanent=true"
+      - "traefik.http.routers.traefik.middlewares=traefik-redirect-to-https"
   nginx1:
     image: nginx:latest
     container_name: nginx1
     hostname: nginx1
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nginx1.entrypoints=https"
+      - "traefik.http.routers.nginx1.entrypoints=http"
       - "traefik.http.routers.nginx1.rule=Host(`nginx1.alselon.ru`)"
-      - "traefik.http.routers.nginx1.tls=true"
-      - "traefik.http.routers.nginx1.tls.certresolver=letsEncrypt"
+      - "traefik.http.routers.nginx1-https.entrypoints=https"
+      - "traefik.http.routers.nginx1-https.rule=Host(`nginx1.alselon.ru`)"
+      - "traefik.http.routers.nginx1-https.tls=true"
+      - "traefik.http.routers.nginx1-https.tls.certresolver=letsEncrypt"
+      - "traefik.http.middlewares.nginx1-redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.nginx1-redirect-to-https.redirectscheme.permanent=true"
+      - "traefik.http.routers.nginx1.middlewares=nginx1-redirect-to-https"
+
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./conf.d.1:/etc/nginx/conf.d
@@ -47,17 +57,17 @@ services:
     hostname: nginx2
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nginx2.entrypoints=https"
+      - "traefik.http.routers.nginx2.entrypoints=http"
       - "traefik.http.routers.nginx2.rule=Host(`nginx2.alselon.ru`)"
-      - "traefik.http.routers.nginx2.tls=true"
-      - "traefik.http.routers.nginx2.tls.certresolver=letsEncrypt"
+      - "traefik.http.routers.nginx2-https.entrypoints=https"
+      - "traefik.http.routers.nginx2-https.rule=Host(`nginx2.alselon.ru`)"
+      - "traefik.http.routers.nginx2-https.tls=true"
+      - "traefik.http.routers.nginx2-https.tls.certresolver=letsEncrypt"
+      - "traefik.http.middlewares.nginx2-redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.nginx2-redirect-to-https.redirectscheme.permanent=true"
+      - "traefik.http.routers.nginx2.middlewares=nginx2-redirect-to-https"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./conf.d.2:/etc/nginx/conf.d
       - ./logs2:/var/log/nginx
       - /var/www:/var/www
-
-#networks:
-#  default:
-#    external:
-#      name: $DEFAULT_NETWORK
